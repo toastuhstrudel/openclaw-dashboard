@@ -3,7 +3,7 @@
     {
       "name": "Toasti Strudel",
       "type": "Main Agent",
-      "emoji": "🥨",
+      "emoji": "🤖",
       "description": "Revenue-strudel familiar - sharp, proactive, opportunistic",
       "files": [
         {"name": "SOUL.md"},
@@ -17,7 +17,7 @@
     {
       "name": "Larry",
       "type": "Sub-agent",
-      "emoji": "🎵",
+      "emoji": "🤖",
       "description": "TikTok App Marketing - automates slideshow marketing",
       "files": [
         {"name": "SKILL.md"},
@@ -28,7 +28,7 @@
     {
       "name": "Muffin",
       "type": "Sub-agent",
-      "emoji": "🥐",
+      "emoji": "🤖",
       "description": "Trading bot - scans markets, finds setups, manages positions",
       "files": [
         {"name": "muffin-run.js"},
@@ -38,7 +38,7 @@
     {
       "name": "App Ideation",
       "type": "Sub-agent",
-      "emoji": "💡",
+      "emoji": "🤖",
       "description": "Finds viral app opportunities - v1 (trends) + v2 (revenue)",
       "files": [
         {"name": "app-ideation/SKILL.md"},
