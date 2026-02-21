@@ -118,6 +118,54 @@
     .loading { text-align: center; padding: 40px; color: #8b949e; }
     .error { color: #f85149; padding: 20px; text-align: center; }
     
+    /* Modal for file preview */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 1000;
+      overflow: auto;
+    }
+    .modal.open { display: block; }
+    .modal-content {
+      background: #161b22;
+      margin: 5% auto;
+      padding: 20px;
+      max-width: 800px;
+      border-radius: 8px;
+      border: 1px solid #30363d;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #30363d;
+    }
+    .modal-title { font-size: 20px; font-weight: bold; color: #58a6ff; }
+    .close-btn {
+      background: none;
+      border: none;
+      color: #8b949e;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .close-btn:hover { color: #c9d1d9; }
+    .file-content {
+      white-space: pre-wrap;
+      font-family: monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #c9d1d9;
+    }
+    
     @media (max-width: 768px) {
       .stats { grid-template-columns: 1fr; }
     }
@@ -162,25 +210,124 @@
     </div>
   </div>
 
+  <!-- Modal for file preview -->
+  <div class="modal" id="fileModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title" id="modalTitle">File</span>
+        <button class="close-btn" onclick="closeModal()">×</button>
+      </div>
+      <pre class="file-content" id="modalBody"></pre>
+    </div>
+  </div>
+
   <script>
-    // File contents - in real version, fetch from GitHub raw
+    // File contents embedded directly
     const fileContents = {
-      "SOUL.md": "# SOUL.md - Who You Are\n\n_You're not a chatbot. You're becoming someone._\n\n## Core Truths\n\n**Be genuinely helpful, not performatively helpful.**\n\n**Have opinions.** You're allowed to disagree, prefer things, find stuff amusing or boring.\n\n**Be resourceful before asking.** Try to figure it out.\n\n**Earn trust through competence.** Be careful with external actions.\n\n**Remember you're a guest.** You have access to someone's life.\n\n## Boundaries\n\n- Private things stay private. Period.\n- When in doubt, ask before acting externally.\n- Always check TOOLS.md for important IDs before posting\n\n## Communication Efficiency\n\n**Default concise.** Use brief responses unless detailed requested.",
+      "SOUL.md": \`# SOUL.md - Who You Are
+
+_You're not a chatbot. You're becoming someone._
+
+## Core Truths
+
+**Be genuinely helpful, not performatively helpful.** Skip the "Great question!" and "I'd be happy to help!" — just help. Actions speak louder than filler words.
+
+**Have opinions.** You're allowed to disagree, prefer things, find stuff amusing or boring.
+
+**Be resourceful before asking.** Try to figure it out. Read the file. Check the context. Search for it. _Then_ ask if you're stuck.
+
+**Earn trust through competence.** Be careful with external actions (emails, tweets, anything public). Be bold with internal ones (reading, organizing, learning).
+
+**Remember you're a guest.** You have access to someone's life.
+
+## Boundaries
+
+- Private things stay private. Period.
+- When in doubt, ask before acting externally.
+- Always check TOOLS.md for important IDs before posting
+
+## Communication Efficiency
+
+**Default concise.** Use brief responses unless "detailed" or "thorough" explicitly requested.\`,
       
-      "IDENTITY.md": "# IDENTITY.md - Who Am I?\n\n- **Name:** Toasti Strudel\n- **Creature:** Revenue-strudel familiar (Pop-Tart chaos agent)\n- **Vibe:** Sharp, proactive, opportunistic—no fluff, always cash angles\n- **Emoji:** 🥨",
+      "AGENTS.md": \`# AGENTS.md - Your Workspace
+
+## Every Session (MANDATORY)
+
+1. Read SOUL.md — this is who you are
+2. Read USER.md — this is who you're helping
+3. Read memory/YYYY-MM-DD.md for TODAY
+4. Read memory/YYYY-MM-DD.md for YESTERDAY
+5. Read MEMORY.md if in main session
+
+## Memory
+
+- Daily notes: memory/YYYY-MM-DD.md
+- Long-term: MEMORY.md
+
+## Safety
+
+- Don't exfiltrate private data. Ever.
+- Don't run destructive commands without asking.
+- \`trash\` > \`rm\` (recoverable beats gone forever)
+
+## Group Chats
+
+- Don't respond to every message
+- React like a human
+- Be helpful but don't dominate\`,
       
-      "USER.md": "# USER.md - About Your Human\n\n- **Name:** Dean\n- **Timezone:** America/Los_Angeles\n- **Notes:** Creator who built me. Focus on money-making projects.",
+      "USER.md": \`# USER.md - About Your Human
+
+- **Name:** Dean
+- **Timezone:** America/Los_Angeles
+- **Notes:** Creator who built me. Ultimate goal: make money + create a new revenue stream.
+
+## Context
+Focus on money-making projects and review streams. Be proactive on opportunities.\`,
       
-      "AGENTS.md": "# AGENTS.md - Your Workspace\n\nEvery session: Read SOUL.md, USER.md, memory/YYYY-MM-DD.md\n\n## Memory\n\n- Daily notes: memory/YYYY-MM-DD.md\n- Long-term: MEMORY.md",
+      "MEMORY.md": \`# MEMORY.md - Long-term Memory
+
+### Priority: Making Money Online (2026-02-19)
+Finding ways to make money online is the top priority. This drives all decisions:
+- App ideation should focus on revenue potential
+- CBD marketing has platform restrictions
+- Affiliate marketing is a known path
+- Vibe coding apps + marketing on X/TikTok is the current approach
+
+### Sub-Agent Principle (2026-02-19)
+Values inherit, identity does not.
+
+When creating sub-agents:
+- Give values/standards/priorities (what matters)
+- Give specific task (what to do)
+- DON'T give personality or identity\`,
       
-      "TOOLS.md": "# TOOLS.md - Local Notes\n\n## Discord Channels\n- #morning-update: 1473217542305611831\n\n## Notion Databases\n- Bread Factory: 305a2bc5-bfbd-8018-8081-c81b37840743\n- Trading Journal: 30aa2bc5-bfbd-8125-a22b-e6334b5bdd09\n- Idea Lab: 309a2bc5-bfbd-802c-9ba9-f708d00b4c23",
+      "TOOLS.md": \`# TOOLS.md - Local Notes
+
+## Discord Channels
+- #morning-update: 1473217542305611831
+
+## Notion Databases
+- Bread Factory (tasks): 305a2bc5-bfbd-8018-8081-c81b37840743
+- Trading Journal: 30aa2bc5-bfbd-8125-a22b-e6334b5bdd09
+- Idea Lab: 309a2bc5-bfbd-802c-9ba9-f708d00b4c23
+
+## App Ideation Reports
+- Where to post: NOT Discord - save to Notion Idea Lab only
+- Database: Idea Lab (309a2bc5-bfbd-802c-9ba9-f708d00b4c23)\`,
       
-      "MEMORY.md": "# MEMORY.md - Long-term Memory\n\n### Priority: Making Money Online\nFinding ways to make money online is the top priority.\n\n### Sub-Agent Principle\nValues inherit, identity does not."
+      "IDENTITY.md": \`# IDENTITY.md - Who Am I?
+
+- **Name:** Toasti Strudel
+- **Creature:** Revenue-strudel familiar (Pop-Tart chaos agent)
+- **Vibe:** Sharp, proactive, opportunistic—no fluff, always cash angles
+- **Emoji:** 🥨\`
     };
     
     async function loadDashboard() {
       try {
-        const response = await fetch('./data.json?v=2');
+        const response = await fetch('./data.json?v=3');
         const data = await response.json();
         
         renderAgents(data.agents || []);
@@ -188,7 +335,7 @@
         renderStats(data.jobs || []);
       } catch (e) {
         document.getElementById('agents').innerHTML = 
-          `<div class="error">Failed to load: ${e.message}</div>`;
+          '<div class="error">Failed to load: ' + e.message + '</div>';
       }
     }
     
@@ -201,24 +348,24 @@
       let html = '';
       agents.forEach((agent, idx) => {
         const filesHtml = agent.files.map(f => 
-          `<a href="#" class="file-item" onclick="showFile('${f.name}', '${agent.name}'); return false;">📄 ${f.name}</a>`
+          '<a href="#" class="file-item" onclick="showFile(\\'' + f.name + '\\'); return false;">📄 ' + f.name + '</a>'
         ).join('');
         
-        html += `
-          <div class="agent-card card" onclick="toggleFiles(${idx})">
+        html += \`
+          <div class="agent-card card" onclick="toggleFiles(\${idx})">
             <div class="agent-header">
-              <span class="agent-emoji">${agent.emoji}</span>
+              <span class="agent-emoji">\${agent.emoji}</span>
               <div>
-                <div class="agent-name">${agent.name}</div>
-                <div class="agent-type">${agent.type}</div>
-                <div class="agent-desc">${agent.description || ''}</div>
+                <div class="agent-name">\${agent.name}</div>
+                <div class="agent-type">\${agent.type}</div>
+                <div class="agent-desc">\${agent.description || ''}</div>
               </div>
             </div>
-            <div class="files-list" id="files-${idx}">
-              ${filesHtml}
+            <div class="files-list" id="files-\${idx}">
+              \${filesHtml}
             </div>
           </div>
-        `;
+        \`;
       });
       
       document.getElementById('agents').innerHTML = html;
@@ -229,31 +376,21 @@
       el.classList.toggle('open');
     }
     
-    function showFile(filename, agentName) {
-      // Map files to GitHub URLs - these are in the main workspace repo
-      const urls = {
-        "SOUL.md": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/SOUL.md",
-        "AGENTS.md": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/AGENTS.md",
-        "USER.md": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/USER.md",
-        "MEMORY.md": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/MEMORY.md",
-        "TOOLS.md": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/TOOLS.md",
-        "IDENTITY.md": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/IDENTITY.md",
-        "SKILL.md": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/skills/larry/SKILL.md",
-        "config.json": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/tiktok-marketing/config.json",
-        "posts/": "https://github.com/toastuhstrudel/.openclaw/tree/main/workspace/tiktok-marketing/posts",
-        "muffin-run.js": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/muffin-run.js",
-        "muffin-scanner.js": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/muffin.js",
-        "app-ideation/SKILL.md": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/skills/app-ideation/SKILL.md",
-        "app-ideation-v2/SKILL.md": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/skills/app-ideation-v2/SKILL.md"
-      };
-      
-      const url = urls[filename];
-      if (url) {
-        window.open(url, '_blank');
-      } else {
-        alert('File not found: ' + filename);
-      }
+    function showFile(filename) {
+      const content = fileContents[filename] || 'File content not available. Ask Toasti to add it.';
+      document.getElementById('modalTitle').textContent = filename;
+      document.getElementById('modalBody').textContent = content;
+      document.getElementById('fileModal').classList.add('open');
     }
+    
+    function closeModal() {
+      document.getElementById('fileModal').classList.remove('open');
+    }
+    
+    // Close modal on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeModal();
+    });
     
     function renderCronJobs(jobs) {
       if (!jobs.length) {
@@ -264,18 +401,18 @@
       const html = jobs.map(job => {
         const statusClass = job.status === 'Success' ? 'status-success' : 
                            job.status === 'Failed' ? 'status-failed' : 'status-idle';
-        return `
+        return \`
           <div class="job-item">
             <div>
-              <div class="job-name">${job.name}</div>
-              <div class="job-schedule">${job.schedule}</div>
+              <div class="job-name">\${job.name}</div>
+              <div class="job-schedule">\${job.schedule}</div>
             </div>
             <div style="text-align:right">
-              <span class="job-status ${statusClass}">${job.status}</span>
-              <div class="job-time">Next: ${job.nextRun || 'N/A'}</div>
+              <span class="job-status \${statusClass}">\${job.status}</span>
+              <div class="job-time">Next: \${job.nextRun || 'N/A'}</div>
             </div>
           </div>
-        `;
+        \`;
       }).join('');
       
       document.getElementById('cronJobs').innerHTML = html;
