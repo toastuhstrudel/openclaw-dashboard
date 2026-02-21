@@ -1,0 +1,10 @@
+{
+  "jobs": [
+    {"name": "bread-factory-check", "type": "Cron Job", "status": "Success", "schedule": "0 2 * * *", "lastRun": "2026-02-19", "nextRun": "2026-02-20", "notes": "Checks Bread Factory for Not Started tasks"},
+    {"name": "muffin-daily-report", "type": "Cron Job", "status": "Success", "schedule": "0 8 * * *", "lastRun": "2026-02-20", "nextRun": "2026-02-20", "notes": "Posts Muffin scan to Discord"},
+    {"name": "muffin-morning-update", "type": "Cron Job", "status": "Success", "schedule": "0 7 * * *", "lastRun": "2026-02-20", "nextRun": "2026-02-20", "notes": "Morning trading journal update"},
+    {"name": "muffin-auto-scan", "type": "Cron Job", "status": "Success", "schedule": "0 */2 * * *", "lastRun": "2026-02-20", "nextRun": "2026-02-20", "notes": "Runs Muffin scanner every 2 hours"},
+    {"name": "muffin-meeting", "type": "Cron Job", "status": "Success", "schedule": "30 7 * * *", "lastRun": "2026-02-20", "nextRun": "2026-02-20", "notes": "Trading journal review"},
+    {"name": "app-ideation-daily", "type": "Cron Job", "status": "Success", "schedule": "0 11 * * *", "lastRun": "2026-02-20", "nextRun": "2026-02-20", "notes": "App ideation v1 + v2 report"}
+  ]
+}

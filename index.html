@@ -167,11 +167,10 @@
   </div>
 
   <script>
-    const NOTION_API = '/api/notion'; // Vercel API route
-    
+    // Load from local JSON file (static hosting compatible)
     async function loadDashboard() {
       try {
-        const response = await fetch(NOTION_API);
+        const response = await fetch('./data.json');
         const data = await response.json();
         
         renderCronJobs(data.jobs || []);
@@ -198,6 +197,7 @@
             <div>
               <div class="job-name">${job.name}</div>
               <div class="job-schedule">${job.schedule}</div>
+              <div class="job-schedule">${job.notes || ''}</div>
             </div>
             <div style="text-align:right">
               <span class="job-status ${statusClass}">${job.status}</span>
@@ -226,9 +226,9 @@
         { name: 'TOOLS.md', path: 'TOOLS.md' }
       ];
       
-      const workspaceUrl = 'https://github.com/deanfieldz/.openclaw/blob/main/workspace';
+      // Note: These links won't work without the actual files in the repo
       const html = memories.map(m => 
-        `<a href="${workspaceUrl}/${m.path}" target="_blank" class="memory-link">
+        `<a href="#" class="memory-link">
           📄 ${m.name}
         </a>`
       ).join('');
@@ -238,9 +238,6 @@
     
     // Load on start
     loadDashboard();
-    
-    // Auto-refresh every 5 minutes
-    setInterval(loadDashboard, 5 * 60 * 1000);
   </script>
 </body>
 </html>
