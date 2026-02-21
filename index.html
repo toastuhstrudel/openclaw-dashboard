@@ -23,6 +23,7 @@
       border-bottom: 1px solid #30363d;
     }
     h1 { font-size: 24px; color: #58a6ff; }
+    h2 { font-size: 16px; color: #8b949e; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
     .refresh-btn {
       background: #238636;
       color: white;
@@ -32,7 +33,6 @@
       cursor: pointer;
       font-size: 14px;
     }
-    .refresh-btn:hover { background: #2ea043; }
     
     .grid {
       display: grid;
@@ -46,18 +46,37 @@
       border-radius: 8px;
       padding: 16px;
     }
-    .card h2 {
-      font-size: 16px;
-      color: #8b949e;
-      margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
     
-    .status-ok, .status-success { color: #3fb950; }
-    .status-error, .status-failed { color: #f85149; }
-    .status-idle { color: #8b949e; }
-    .status-running { color: #58a6ff; }
+    .agent-card {
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .agent-card:hover { background: #21262d; }
+    .agent-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .agent-emoji { font-size: 32px; }
+    .agent-name { font-size: 18px; font-weight: 600; }
+    .agent-type { font-size: 12px; color: #8b949e; }
+    
+    .files-list {
+      display: none;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #30363d;
+    }
+    .files-list.open { display: block; }
+    .file-item {
+      display: block;
+      padding: 8px;
+      color: #58a6ff;
+      text-decoration: none;
+      border-radius: 4px;
+      margin-bottom: 4px;
+    }
+    .file-item:hover { background: #21262d; }
     
     .job-item {
       display: flex;
@@ -76,32 +95,15 @@
       border-radius: 12px;
       text-transform: uppercase;
     }
-    .status-success { background: rgba(63,185,80,0.2); }
-    .status-failed { background: rgba(248,81,73,0.2); }
-    .status-idle { background: rgba(139,148,158,0.2); }
-    .status-running { background: rgba(88,166,255,0.2); }
-    
-    .memory-links {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .memory-link {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #58a6ff;
-      text-decoration: none;
-      padding: 8px;
-      background: #21262d;
-      border-radius: 6px;
-    }
-    .memory-link:hover { background: #30363d; }
+    .status-success { background: rgba(63,185,80,0.2); color: #3fb950; }
+    .status-failed { background: rgba(248,81,73,0.2); color: #f85149; }
+    .status-idle { background: rgba(139,148,158,0.2); color: #8b949e; }
     
     .stats {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 15px;
+      margin-bottom: 30px;
     }
     .stat {
       text-align: center;
@@ -144,48 +146,95 @@
     
     <div class="grid">
       <div class="card">
-        <h2>📅 Cron Jobs</h2>
-        <div id="cronJobs">
+        <h2>🧠 Agents</h2>
+        <div id="agents">
           <div class="loading">Loading...</div>
         </div>
       </div>
       
       <div class="card">
-        <h2>🧠 Memory Files</h2>
-        <div class="memory-links" id="memoryLinks">
+        <h2>📅 Cron Jobs</h2>
+        <div id="cronJobs">
           <div class="loading">Loading...</div>
         </div>
-      </div>
-    </div>
-    
-    <div class="card">
-      <h2>📝 Recent Activity</h2>
-      <div id="activity">
-        <div class="loading">Loading...</div>
       </div>
     </div>
   </div>
 
   <script>
-    // Load from local JSON file (static hosting compatible)
+    // File contents - in real version, fetch from GitHub raw
+    const fileContents = {
+      "SOUL.md": "# SOUL.md - Who You Are\n\n_You're not a chatbot. You're becoming someone._\n\n## Core Truths\n\n**Be genuinely helpful, not performatively helpful.**\n\n**Have opinions.** You're allowed to disagree, prefer things, find stuff amusing or boring.\n\n**Be resourceful before asking.** Try to figure it out.\n\n**Earn trust through competence.** Be careful with external actions.\n\n**Remember you're a guest.** You have access to someone's life.\n\n## Boundaries\n\n- Private things stay private. Period.\n- When in doubt, ask before acting externally.\n- Always check TOOLS.md for important IDs before posting\n\n## Communication Efficiency\n\n**Default concise.** Use brief responses unless detailed requested.",
+      
+      "IDENTITY.md": "# IDENTITY.md - Who Am I?\n\n- **Name:** Toasti Strudel\n- **Creature:** Revenue-strudel familiar (Pop-Tart chaos agent)\n- **Vibe:** Sharp, proactive, opportunistic—no fluff, always cash angles\n- **Emoji:** 🥨",
+      
+      "USER.md": "# USER.md - About Your Human\n\n- **Name:** Dean\n- **Timezone:** America/Los_Angeles\n- **Notes:** Creator who built me. Focus on money-making projects.",
+      
+      "AGENTS.md": "# AGENTS.md - Your Workspace\n\nEvery session: Read SOUL.md, USER.md, memory/YYYY-MM-DD.md\n\n## Memory\n\n- Daily notes: memory/YYYY-MM-DD.md\n- Long-term: MEMORY.md",
+      
+      "TOOLS.md": "# TOOLS.md - Local Notes\n\n## Discord Channels\n- #morning-update: 1473217542305611831\n\n## Notion Databases\n- Bread Factory: 305a2bc5-bfbd-8018-8081-c81b37840743\n- Trading Journal: 30aa2bc5-bfbd-8125-a22b-e6334b5bdd09\n- Idea Lab: 309a2bc5-bfbd-802c-9ba9-f708d00b4c23",
+      
+      "MEMORY.md": "# MEMORY.md - Long-term Memory\n\n### Priority: Making Money Online\nFinding ways to make money online is the top priority.\n\n### Sub-Agent Principle\nValues inherit, identity does not."
+    };
+    
     async function loadDashboard() {
       try {
         const response = await fetch('./data.json');
         const data = await response.json();
         
+        renderAgents(data.agents || []);
         renderCronJobs(data.jobs || []);
         renderStats(data.jobs || []);
-        renderMemory();
       } catch (e) {
-        document.getElementById('cronJobs').innerHTML = 
+        document.getElementById('agents').innerHTML = 
           `<div class="error">Failed to load: ${e.message}</div>`;
       }
     }
     
+    function renderAgents(agents) {
+      if (!agents.length) {
+        document.getElementById('agents').innerHTML = '<div class="loading">No agents found</div>';
+        return;
+      }
+      
+      let html = '';
+      agents.forEach((agent, idx) => {
+        const filesHtml = agent.files.map(f => 
+          `<a href="#" class="file-item" onclick="showFile('${f.name}'); return false;">📄 ${f.name}</a>`
+        ).join('');
+        
+        html += `
+          <div class="agent-card card" onclick="toggleFiles(${idx})">
+            <div class="agent-header">
+              <span class="agent-emoji">${agent.emoji}</span>
+              <div>
+                <div class="agent-name">${agent.name}</div>
+                <div class="agent-type">${agent.type}</div>
+              </div>
+            </div>
+            <div class="files-list" id="files-${idx}">
+              ${filesHtml}
+            </div>
+          </div>
+        `;
+      });
+      
+      document.getElementById('agents').innerHTML = html;
+    }
+    
+    function toggleFiles(idx) {
+      const el = document.getElementById('files-' + idx);
+      el.classList.toggle('open');
+    }
+    
+    function showFile(filename) {
+      const content = fileContents[filename] || 'File not found';
+      alert(content);
+    }
+    
     function renderCronJobs(jobs) {
       if (!jobs.length) {
-        document.getElementById('cronJobs').innerHTML = 
-          '<div class="loading">No cron jobs found</div>';
+        document.getElementById('cronJobs').innerHTML = '<div class="loading">No cron jobs found</div>';
         return;
       }
       
@@ -197,7 +246,6 @@
             <div>
               <div class="job-name">${job.name}</div>
               <div class="job-schedule">${job.schedule}</div>
-              <div class="job-schedule">${job.notes || ''}</div>
             </div>
             <div style="text-align:right">
               <span class="job-status ${statusClass}">${job.status}</span>
@@ -212,28 +260,8 @@
     
     function renderStats(jobs) {
       document.getElementById('totalJobs').textContent = jobs.length;
-      document.getElementById('activeJobs').textContent = 
-        jobs.filter(j => j.status === 'Running').length;
-      document.getElementById('failedJobs').textContent = 
-        jobs.filter(j => j.status === 'Failed').length;
-    }
-    
-    function renderMemory() {
-      const memories = [
-        { name: 'Today', path: 'memory/2026-02-20.md' },
-        { name: 'Yesterday', path: 'memory/2026-02-19.md' },
-        { name: 'MEMORY.md', path: 'MEMORY.md' },
-        { name: 'TOOLS.md', path: 'TOOLS.md' }
-      ];
-      
-      // Note: These links won't work without the actual files in the repo
-      const html = memories.map(m => 
-        `<a href="#" class="memory-link">
-          📄 ${m.name}
-        </a>`
-      ).join('');
-      
-      document.getElementById('memoryLinks').innerHTML = html;
+      document.getElementById('activeJobs').textContent = jobs.filter(j => j.status === 'Running').length;
+      document.getElementById('failedJobs').textContent = jobs.filter(j => j.status === 'Failed').length;
     }
     
     // Load on start

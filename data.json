@@ -1,4 +1,19 @@
 {
+  "agents": [
+    {
+      "name": "Toasti Strudel",
+      "type": "Main Agent",
+      "emoji": "🥨",
+      "files": [
+        {"name": "SOUL.md", "path": "SOUL.md"},
+        {"name": "AGENTS.md", "path": "AGENTS.md"},
+        {"name": "USER.md", "path": "USER.md"},
+        {"name": "MEMORY.md", "path": "MEMORY.md"},
+        {"name": "TOOLS.md", "path": "TOOLS.md"},
+        {"name": "IDENTITY.md", "path": "IDENTITY.md"}
+      ]
+    }
+  ],
   "jobs": [
     {"name": "bread-factory-check", "type": "Cron Job", "status": "Success", "schedule": "0 2 * * *", "lastRun": "2026-02-19", "nextRun": "2026-02-20", "notes": "Checks Bread Factory for Not Started tasks"},
     {"name": "muffin-daily-report", "type": "Cron Job", "status": "Success", "schedule": "0 8 * * *", "lastRun": "2026-02-20", "nextRun": "2026-02-20", "notes": "Posts Muffin scan to Discord"},
