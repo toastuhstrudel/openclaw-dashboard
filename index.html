@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenClaw Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0d1117;
+      color: #c9d1d9;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #30363d;
+    }
+    h1 { font-size: 24px; color: #58a6ff; }
+    .refresh-btn {
+      background: #238636;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .refresh-btn:hover { background: #2ea043; }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .card h2 {
+      font-size: 16px;
+      color: #8b949e;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .status-ok, .status-success { color: #3fb950; }
+    .status-error, .status-failed { color: #f85149; }
+    .status-idle { color: #8b949e; }
+    .status-running { color: #58a6ff; }
+    
+    .job-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #30363d;
+    }
+    .job-item:last-child { border-bottom: none; }
+    .job-name { font-weight: 600; }
+    .job-schedule { font-size: 12px; color: #8b949e; }
+    .job-time { font-size: 12px; color: #8b949e; text-align: right; }
+    .job-status {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+    }
+    .status-success { background: rgba(63,185,80,0.2); }
+    .status-failed { background: rgba(248,81,73,0.2); }
+    .status-idle { background: rgba(139,148,158,0.2); }
+    .status-running { background: rgba(88,166,255,0.2); }
+    
+    .memory-links {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .memory-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #58a6ff;
+      text-decoration: none;
+      padding: 8px;
+      background: #21262d;
+      border-radius: 6px;
+    }
+    .memory-link:hover { background: #30363d; }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+    .stat {
+      text-align: center;
+      padding: 20px;
+      background: #21262d;
+      border-radius: 8px;
+    }
+    .stat-value { font-size: 32px; font-weight: bold; color: #58a6ff; }
+    .stat-label { font-size: 12px; color: #8b949e; margin-top: 4px; }
+    
+    .loading { text-align: center; padding: 40px; color: #8b949e; }
+    .error { color: #f85149; padding: 20px; text-align: center; }
+    
+    @media (max-width: 768px) {
+      .stats { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🦞 OpenClaw Dashboard</h1>
+      <button class="refresh-btn" onclick="loadDashboard()">↻ Refresh</button>
+    </header>
+    
+    <div class="stats" id="stats">
+      <div class="stat">
+        <div class="stat-value" id="totalJobs">-</div>
+        <div class="stat-label">Cron Jobs</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="activeJobs">-</div>
+        <div class="stat-label">Active Jobs</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="failedJobs">-</div>
+        <div class="stat-label">Failed</div>
+      </div>
+    </div>
+    
+    <div class="grid">
+      <div class="card">
+        <h2>📅 Cron Jobs</h2>
+        <div id="cronJobs">
+          <div class="loading">Loading...</div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2>🧠 Memory Files</h2>
+        <div class="memory-links" id="memoryLinks">
+          <div class="loading">Loading...</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h2>📝 Recent Activity</h2>
+      <div id="activity">
+        <div class="loading">Loading...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const NOTION_API = '/api/notion'; // Vercel API route
+    
+    async function loadDashboard() {
+      try {
+        const response = await fetch(NOTION_API);
+        const data = await response.json();
+        
+        renderCronJobs(data.jobs || []);
+        renderStats(data.jobs || []);
+        renderMemory();
+      } catch (e) {
+        document.getElementById('cronJobs').innerHTML = 
+          `<div class="error">Failed to load: ${e.message}</div>`;
+      }
+    }
+    
+    function renderCronJobs(jobs) {
+      if (!jobs.length) {
+        document.getElementById('cronJobs').innerHTML = 
+          '<div class="loading">No cron jobs found</div>';
+        return;
+      }
+      
+      const html = jobs.map(job => {
+        const statusClass = job.status === 'Success' ? 'status-success' : 
+                           job.status === 'Failed' ? 'status-failed' : 'status-idle';
+        return `
+          <div class="job-item">
+            <div>
+              <div class="job-name">${job.name}</div>
+              <div class="job-schedule">${job.schedule}</div>
+            </div>
+            <div style="text-align:right">
+              <span class="job-status ${statusClass}">${job.status}</span>
+              <div class="job-time">Next: ${job.nextRun || 'N/A'}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      document.getElementById('cronJobs').innerHTML = html;
+    }
+    
+    function renderStats(jobs) {
+      document.getElementById('totalJobs').textContent = jobs.length;
+      document.getElementById('activeJobs').textContent = 
+        jobs.filter(j => j.status === 'Running').length;
+      document.getElementById('failedJobs').textContent = 
+        jobs.filter(j => j.status === 'Failed').length;
+    }
+    
+    function renderMemory() {
+      const memories = [
+        { name: 'Today', path: 'memory/2026-02-20.md' },
+        { name: 'Yesterday', path: 'memory/2026-02-19.md' },
+        { name: 'MEMORY.md', path: 'MEMORY.md' },
+        { name: 'TOOLS.md', path: 'TOOLS.md' }
+      ];
+      
+      const workspaceUrl = 'https://github.com/deanfieldz/.openclaw/blob/main/workspace';
+      const html = memories.map(m => 
+        `<a href="${workspaceUrl}/${m.path}" target="_blank" class="memory-link">
+          📄 ${m.name}
+        </a>`
+      ).join('');
+      
+      document.getElementById('memoryLinks').innerHTML = html;
+    }
+    
+    // Load on start
+    loadDashboard();
+    
+    // Auto-refresh every 5 minutes
+    setInterval(loadDashboard, 5 * 60 * 1000);
+  </script>
+</body>
+</html>
