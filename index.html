@@ -122,7 +122,7 @@
       jobs.forEach(function(job) {
         var statusClass = job.lastStatus === 'success' ? 'status-success' : job.lastStatus === 'failed' ? 'status-failed' : 'status-idle';
         var statusIcon = job.lastStatus === 'success' ? '✓' : job.lastStatus === 'failed' ? '✗' : '?';
-        html += '<div class="job-item"><div class="job-info"><div class="job-name">' + job.name + '</div><div class="job-desc">' + job.description + '</div><div class="job-schedule">' + job.schedule + ' '</div></div><div class="job-status-section"><div class="job-status ' + statusClass + '">' + statusIcon + ' ' + job.lastStatus + '</div><div class="job-time">Last: ' + job.lastRun + '</div><div class="job-time">Next: ' + job.nextRun + '</div></div></div>';
+        html += '<div class="job-item"><div class="job-info"><div class="job-name">' + job.name + '</div><div class="job-desc">' + job.description + '</div><div class="job-schedule">' + job.schedule + '</div></div><div class="job-status-section"><div class="job-status ' + statusClass + '">' + statusIcon + ' ' + job.lastStatus + '</div><div class="job-time">Last: ' + job.lastRun + '</div><div class="job-time">Next: ' + job.nextRun + '</div></div></div>';
       });
       document.getElementById('cronJobs').innerHTML = html;
     }
