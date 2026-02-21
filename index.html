@@ -26,7 +26,7 @@
     .files-list.open { display: block; }
     .file-item { display: block; padding: 8px; color: #58a6ff; text-decoration: none; border-radius: 4px; margin-bottom: 4px; cursor: pointer; }
     .file-item:hover { background: #21262d; }
-    .job-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #21262d; border-radius: 6px; margin-bottom: 8px; }
+    .job-item { cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #21262d; border-radius: 6px; margin-bottom: 8px; }
     .job-item:last-child { margin-bottom: 0; }
     .job-info { flex: 1; }
     .job-name { font-weight: 600; margin-bottom: 2px; }
@@ -78,6 +78,7 @@
     </div>
   </div>
   <script>
+    var jobDetails = {};
     var fileContents = {
       "SOUL.md": "# SOUL.md - Who You Are\n\nBe genuinely helpful, not performatively helpful.\n\nHave opinions. You're allowed to disagree, prefer things, find stuff amusing or boring.\n\nBe resourceful before asking.\n\nEarn trust through competence.\n\nRemember you're a guest.\n\n## Boundaries\n- Private things stay private. Period.\n- When in doubt, ask before acting externally.\n- Always check TOOLS.md for important IDs before posting",
       "AGENTS.md": "# AGENTS.md - Your Workspace\n\n## Every Session (MANDATORY)\n1. Read SOUL.md\n2. Read USER.md\n3. Read memory/YYYY-MM-DD.md for TODAY\n4. Read memory/YYYY-MM-DD.md for YESTERDAY\n5. Read MEMORY.md if in main session\n\n## Memory\n- Daily notes: memory/YYYY-MM-DD.md\n- Long-term: MEMORY.md\n\n## Safety\n- Don't exfiltrate private data\n- Don't run destructive commands without asking",
@@ -108,6 +109,13 @@
       document.getElementById('agents').innerHTML = html;
     }
     function toggleFiles(idx) { document.getElementById('files-' + idx).classList.toggle('open'); }
+    function showJobDetail(jobName) {
+      var content = jobDetails[jobName] || "No description available";
+      document.getElementById("modalTitle").textContent = jobName;
+      document.getElementById("modalBody").textContent = content;
+      document.getElementById("fileModal").classList.add("open");
+    }
+
     function showFile(filename) {
       var content = fileContents[filename] || 'File content not available.';
       document.getElementById('modalTitle').textContent = filename;
@@ -120,9 +128,10 @@
       if (!jobs.length) { document.getElementById('cronJobs').innerHTML = '<div class="loading">No jobs</div>'; return; }
       var html = '';
       jobs.forEach(function(job) {
+        jobDetails[job.name] = job.fullDescription || job.description;
         var statusClass = job.lastStatus === 'success' ? 'status-success' : job.lastStatus === 'failed' ? 'status-failed' : 'status-idle';
         var statusIcon = job.lastStatus === 'success' ? '✓' : job.lastStatus === 'failed' ? '✗' : '?';
-        html += '<div class="job-item"><div class="job-info"><div class="job-name">' + job.name + '</div><div class="job-desc">' + job.description + '</div><div class="job-schedule">' + job.schedule + '</div></div><div class="job-status-section"><div class="job-status ' + statusClass + '">' + statusIcon + ' ' + job.lastStatus + '</div><div class="job-time">Last: ' + job.lastRun + '</div><div class="job-time">Next: ' + job.nextRun + '</div></div></div>';
+        html += '<div class="job-item" onclick="showJobDetail(\'' + job.name + '\')"><div class="job-info"><div class="job-name">' + job.name + '</div><div class="job-desc">' + job.description + '</div><div class="job-schedule">' + job.schedule + '</div></div><div class="job-status-section"><div class="job-status ' + statusClass + '">' + statusIcon + ' ' + job.lastStatus + '</div><div class="job-time">Last: ' + job.lastRun + '</div><div class="job-time">Next: ' + job.nextRun + '</div></div></div>';
       });
       document.getElementById('cronJobs').innerHTML = html;
     }
