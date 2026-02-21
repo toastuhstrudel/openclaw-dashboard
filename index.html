@@ -327,7 +327,7 @@ When creating sub-agents:
     
     async function loadDashboard() {
       try {
-        const response = await fetch('./data.json?v=3');
+        const response = await fetch('./data.json?v=4');
         const data = await response.json();
         
         renderAgents(data.agents || []);
