@@ -60,6 +60,7 @@
     .agent-emoji { font-size: 32px; }
     .agent-name { font-size: 18px; font-weight: 600; }
     .agent-type { font-size: 12px; color: #8b949e; }
+    .agent-desc { font-size: 12px; color: #6e7681; margin-top: 4px; }
     
     .files-list {
       display: none;
@@ -200,7 +201,7 @@
       let html = '';
       agents.forEach((agent, idx) => {
         const filesHtml = agent.files.map(f => 
-          `<a href="#" class="file-item" onclick="showFile('${f.name}'); return false;">📄 ${f.name}</a>`
+          `<a href="#" class="file-item" onclick="showFile('${f.name}', '${agent.name}'); return false;">📄 ${f.name}</a>`
         ).join('');
         
         html += `
@@ -210,6 +211,7 @@
               <div>
                 <div class="agent-name">${agent.name}</div>
                 <div class="agent-type">${agent.type}</div>
+                <div class="agent-desc">${agent.description || ''}</div>
               </div>
             </div>
             <div class="files-list" id="files-${idx}">
@@ -227,9 +229,30 @@
       el.classList.toggle('open');
     }
     
-    function showFile(filename) {
-      const content = fileContents[filename] || 'File not found';
-      alert(content);
+    function showFile(filename, agentName) {
+      // Map files to GitHub URLs - these are in the main workspace repo
+      const urls = {
+        "SOUL.md": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/SOUL.md",
+        "AGENTS.md": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/AGENTS.md",
+        "USER.md": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/USER.md",
+        "MEMORY.md": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/MEMORY.md",
+        "TOOLS.md": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/TOOLS.md",
+        "IDENTITY.md": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/IDENTITY.md",
+        "SKILL.md": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/skills/larry/SKILL.md",
+        "config.json": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/tiktok-marketing/config.json",
+        "posts/": "https://github.com/toastuhstrudel/.openclaw/tree/main/workspace/tiktok-marketing/posts",
+        "muffin-run.js": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/muffin-run.js",
+        "muffin-scanner.js": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/muffin.js",
+        "app-ideation/SKILL.md": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/skills/app-ideation/SKILL.md",
+        "app-ideation-v2/SKILL.md": "https://github.com/toastuhstrudel/.openclaw/blob/main/workspace/skills/app-ideation-v2/SKILL.md"
+      };
+      
+      const url = urls[filename];
+      if (url) {
+        window.open(url, '_blank');
+      } else {
+        alert('File not found: ' + filename);
+      }
     }
     
     function renderCronJobs(jobs) {
