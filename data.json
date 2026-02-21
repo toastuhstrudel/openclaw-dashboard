@@ -47,11 +47,11 @@
     }
   ],
   "jobs": [
-    {"name": "bread-factory-check", "type": "Cron Job", "status": "Success", "schedule": "0 2 * * *", "lastRun": "2026-02-19", "nextRun": "2026-02-20", "notes": "Checks Bread Factory for Not Started tasks"},
-    {"name": "muffin-daily-report", "type": "Cron Job", "status": "Success", "schedule": "0 8 * * *", "lastRun": "2026-02-20", "nextRun": "2026-02-20", "notes": "Posts Muffin scan to Discord"},
-    {"name": "muffin-morning-update", "type": "Cron Job", "status": "Success", "schedule": "0 7 * * *", "lastRun": "2026-02-20", "nextRun": "2026-02-20", "notes": "Morning trading journal update"},
-    {"name": "muffin-auto-scan", "type": "Cron Job", "status": "Success", "schedule": "0 */2 * * *", "lastRun": "2026-02-20", "nextRun": "2026-02-20", "notes": "Runs Muffin scanner every 2 hours"},
-    {"name": "muffin-meeting", "type": "Cron Job", "status": "Success", "schedule": "30 7 * * *", "lastRun": "2026-02-20", "nextRun": "2026-02-20", "notes": "Trading journal review"},
-    {"name": "app-ideation-daily", "type": "Cron Job", "status": "Success", "schedule": "0 11 * * *", "lastRun": "2026-02-20", "nextRun": "2026-02-20", "notes": "App ideation v1 + v2 report"}
+    {"name": "bread-factory-check", "schedule": "0 2 * * *", "description": "Checks Bread Factory for Not Started tasks", "lastRun": "2026-02-19 02:00", "lastStatus": "success", "nextRun": "2026-02-20 02:00"},
+    {"name": "muffin-morning-update", "schedule": "0 7 * * *", "description": "Morning trading journal update to Discord", "lastRun": "2026-02-20 07:00", "lastStatus": "success", "nextRun": "2026-02-21 07:00"},
+    {"name": "muffin-meeting", "schedule": "30 7 * * *", "description": "Trading journal review with Muffin", "lastRun": "2026-02-20 07:30", "lastStatus": "success", "nextRun": "2026-02-21 07:30"},
+    {"name": "muffin-daily-report", "schedule": "0 8 * * *", "description": "Daily Muffin scan report to Discord", "lastRun": "2026-02-20 08:00", "lastStatus": "success", "nextRun": "2026-02-21 08:00"},
+    {"name": "muffin-auto-scan", "schedule": "0 */2 * * *", "description": "Runs Muffin scanner every 2 hours", "lastRun": "2026-02-20 18:00", "lastStatus": "success", "nextRun": "2026-02-20 20:00"},
+    {"name": "app-ideation-daily", "schedule": "0 11 * * *", "description": "App ideation v1 + v2 report to Notion", "lastRun": "2026-02-20 11:00", "lastStatus": "success", "nextRun": "2026-02-21 11:00"}
   ]
 }
