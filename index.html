@@ -179,7 +179,7 @@
     
     async function loadDashboard() {
       try {
-        const response = await fetch('./data.json');
+        const response = await fetch('./data.json?v=2');
         const data = await response.json();
         
         renderAgents(data.agents || []);
