@@ -3,244 +3,146 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OpenClaw Dashboard</title>
+  <title>OpenClaw Dashboard v3</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #0d1117;
-      color: #c9d1d9;
-      min-height: 100vh;
-      padding: 20px;
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d1117; color: #c9d1d9; min-height: 100vh; padding: 20px; }
     .container { max-width: 1200px; margin: 0 auto; }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid #30363d;
-    }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #30363d; }
     h1 { font-size: 24px; color: #58a6ff; }
-    .refresh-btn {
-      background: #238636;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .refresh-btn:hover { background: #2ea043; }
-    
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-    .card {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 8px;
-      padding: 16px;
-    }
-    .card h2 {
-      font-size: 16px;
-      color: #8b949e;
-      margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    
-    .status-ok, .status-success { color: #3fb950; }
-    .status-error, .status-failed { color: #f85149; }
-    .status-idle { color: #8b949e; }
-    .status-running { color: #58a6ff; }
-    
-    .job-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 0;
-      border-bottom: 1px solid #30363d;
-    }
-    .job-item:last-child { border-bottom: none; }
-    .job-name { font-weight: 600; }
-    .job-schedule { font-size: 12px; color: #8b949e; }
-    .job-time { font-size: 12px; color: #8b949e; text-align: right; }
-    .job-status {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 12px;
-      text-transform: uppercase;
-    }
-    .status-success { background: rgba(63,185,80,0.2); }
-    .status-failed { background: rgba(248,81,73,0.2); }
-    .status-idle { background: rgba(139,148,158,0.2); }
-    .status-running { background: rgba(88,166,255,0.2); }
-    
-    .memory-links {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .memory-link {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #58a6ff;
-      text-decoration: none;
-      padding: 8px;
-      background: #21262d;
-      border-radius: 6px;
-    }
-    .memory-link:hover { background: #30363d; }
-    
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-    }
-    .stat {
-      text-align: center;
-      padding: 20px;
-      background: #21262d;
-      border-radius: 8px;
-    }
+    h2 { font-size: 16px; color: #8b949e; margin-bottom: 12px; text-transform: uppercase; }
+    .refresh-btn { background: #238636; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 20px; }
+    .card h2 { margin-bottom: 20px; font-size: 18px; color: #58a6ff; border-bottom: 1px solid #30363d; padding-bottom: 12px; }
+    .agent-card { background: #21262d; margin-bottom: 12px; padding: 12px; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
+    .agent-card:hover { background: #30363d; }
+    .agent-header { display: flex; align-items: center; gap: 12px; }
+    .agent-emoji { font-size: 32px; }
+    .agent-name { font-size: 18px; font-weight: 600; }
+    .agent-type { font-size: 12px; color: #8b949e; }
+    .agent-desc { font-size: 12px; color: #6e7681; margin-top: 4px; }
+    .files-list { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #30363d; }
+    .files-list.open { display: block; }
+    .file-item { display: block; padding: 8px; color: #58a6ff; text-decoration: none; border-radius: 4px; margin-bottom: 4px; cursor: pointer; }
+    .file-item:hover { background: #21262d; }
+    .job-item { cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 16px; background: linear-gradient(135deg, #1a1f2e 0%, #21262d 100%); border-radius: 12px; margin-bottom: 12px; border: 1px solid #30363d; transition: all 0.2s; }
+    .job-item:hover { border-color: #58a6ff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    .job-item:last-child { margin-bottom: 0; }
+    .job-info { flex: 1; }
+    .job-name { font-weight: 700; font-size: 16px; margin-bottom: 4px; color: #fff; }
+    .job-desc { font-size: 13px; color: #8b949e; margin-bottom: 8px; }
+    .job-schedule { font-size: 12px; color: #6e7681; font-family: monospace; background: #0d1117; padding: 4px 8px; border-radius: 4px; display: inline-block; }
+    .job-status-section { text-align: right; min-width: 140px; padding-left: 16px; border-left: 1px solid #30363d; }
+    .job-status { font-size: 13px; padding: 6px 12px; border-radius: 6px; display: inline-block; font-weight: 600; margin-bottom: 6px; }
+    .job-time { display: block; font-size: 12px; color: #8b949e; margin-top: 4px; }
+    .job-time-label { color: #6e7681; font-size: 11px; }
+    .status-success { background: rgba(63,185,80,0.2); color: #3fb950; }
+    .status-failed { background: rgba(248,81,73,0.2); color: #f85149; }
+    .status-idle { background: rgba(139,148,158,0.2); color: #8b949e; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px; }
+    .stat { text-align: center; padding: 20px; background: #21262d; border-radius: 8px; }
     .stat-value { font-size: 32px; font-weight: bold; color: #58a6ff; }
     .stat-label { font-size: 12px; color: #8b949e; margin-top: 4px; }
-    
     .loading { text-align: center; padding: 40px; color: #8b949e; }
     .error { color: #f85149; padding: 20px; text-align: center; }
-    
-    @media (max-width: 768px) {
-      .stats { grid-template-columns: 1fr; }
-    }
+    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; overflow: auto; }
+    .modal.open { display: block; }
+    .modal-content { background: #161b22; margin: 5% auto; padding: 20px; max-width: 800px; border-radius: 8px; border: 1px solid #30363d; max-height: 80vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #30363d; }
+    .modal-title { font-size: 20px; font-weight: bold; color: #58a6ff; }
+    .close-btn { background: none; border: none; color: #8b949e; font-size: 24px; cursor: pointer; }
+    .close-btn:hover { color: #c9d1d9; }
+    .file-content { white-space: pre-wrap; font-family: monospace; font-size: 13px; line-height: 1.5; color: #c9d1d9; }
+    @media (max-width: 768px) { .stats { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>🦞 OpenClaw Dashboard</h1>
-      <button class="refresh-btn" onclick="loadDashboard()">↻ Refresh</button>
+      <h1>OpenClaw Dashboard</h1>
+      <button class="refresh-btn" onclick="loadDashboard()">Refresh</button>
     </header>
-    
     <div class="stats" id="stats">
-      <div class="stat">
-        <div class="stat-value" id="totalJobs">-</div>
-        <div class="stat-label">Cron Jobs</div>
-      </div>
-      <div class="stat">
-        <div class="stat-value" id="activeJobs">-</div>
-        <div class="stat-label">Active Jobs</div>
-      </div>
-      <div class="stat">
-        <div class="stat-value" id="failedJobs">-</div>
-        <div class="stat-label">Failed</div>
-      </div>
+      <div class="stat"><div class="stat-value" id="totalJobs">-</div><div class="stat-label">Cron Jobs</div></div>
+      <div class="stat"><div class="stat-value" id="activeJobs">-</div><div class="stat-label">Active</div></div>
+      <div class="stat"><div class="stat-value" id="failedJobs">-</div><div class="stat-label">Failed</div></div>
     </div>
-    
     <div class="grid">
-      <div class="card">
-        <h2>📅 Cron Jobs</h2>
-        <div id="cronJobs">
-          <div class="loading">Loading...</div>
-        </div>
-      </div>
-      
-      <div class="card">
-        <h2>🧠 Memory Files</h2>
-        <div class="memory-links" id="memoryLinks">
-          <div class="loading">Loading...</div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="card">
-      <h2>📝 Recent Activity</h2>
-      <div id="activity">
-        <div class="loading">Loading...</div>
-      </div>
+      <div class="card" style="padding: 16px;"><h2>Agents</h2><div id="agents" style="margin-top: 12px;"></div></div>
+      <div class="card"><h2>Cron Jobs</h2><div id="cronJobs"><div class="loading">Loading...</div></div></div>
     </div>
   </div>
-
+  <div class="modal" id="fileModal">
+    <div class="modal-content">
+      <div class="modal-header"><span class="modal-title" id="modalTitle">File</span><button class="close-btn" onclick="closeModal()">x</button></div>
+      <pre class="file-content" id="modalBody"></pre>
+    </div>
+  </div>
   <script>
-    const NOTION_API = '/api/notion'; // Vercel API route
-    
+    var jobDetails = {};
+    var fileContents = {
+      "SOUL.md": "# SOUL.md - Who You Are\n\nBe genuinely helpful, not performatively helpful.\n\nHave opinions. You're allowed to disagree, prefer things, find stuff amusing or boring.\n\nBe resourceful before asking.\n\nEarn trust through competence.\n\nRemember you're a guest.\n\n## Boundaries\n- Private things stay private. Period.\n- When in doubt, ask before acting externally.\n- Always check TOOLS.md for important IDs before posting",
+      "AGENTS.md": "# AGENTS.md - Your Workspace\n\n## Every Session (MANDATORY)\n1. Read SOUL.md\n2. Read USER.md\n3. Read memory/YYYY-MM-DD.md for TODAY\n4. Read memory/YYYY-MM-DD.md for YESTERDAY\n5. Read MEMORY.md if in main session\n\n## Memory\n- Daily notes: memory/YYYY-MM-DD.md\n- Long-term: MEMORY.md\n\n## Safety\n- Don't exfiltrate private data\n- Don't run destructive commands without asking",
+      "USER.md": "# USER.md - About Your Human\n\n- Name: Dean\n- Timezone: America/Los_Angeles\n- Notes: Creator. Ultimate goal: make money + new revenue stream.\n\nFocus on money-making projects and review streams.",
+      "MEMORY.md": "# MEMORY.md - Long-term Memory\n\n### Priority: Making Money Online\nFinding ways to make money online is the top priority.\n\n### Sub-Agent Principle\nValues inherit, identity does not.\n\nWhen creating sub-agents:\n- Give values/standards/priorities\n- Give specific task\n- DON'T give personality or identity",
+      "TOOLS.md": "# TOOLS.md - Local Notes\n\n## Discord Channels\n- #morning-update: 1473217542305611831\n\n## Notion Databases\n- Bread Factory: 305a2bc5-bfbd-8018-8081-c81b37840743\n- Trading Journal: 30aa2bc5-bfbd-8125-a22b-e6334b5bdd09\n- Idea Lab: 309a2bc5-bfbd-802c-9ba9-f708d00b4c23",
+      "IDENTITY.md": "# IDENTITY.md - Who Am I?\n\n- Name: Toasti Strudel\n- Creature: Revenue-strudel familiar\n- Vibe: Sharp, proactive, opportunistic"
+    };
     async function loadDashboard() {
       try {
-        const response = await fetch(NOTION_API);
-        const data = await response.json();
-        
+        var resp = await fetch('./data.json?v=5');
+        var data = await resp.json();
+        renderAgents(data.agents || []);
         renderCronJobs(data.jobs || []);
         renderStats(data.jobs || []);
-        renderMemory();
-      } catch (e) {
-        document.getElementById('cronJobs').innerHTML = 
-          `<div class="error">Failed to load: ${e.message}</div>`;
-      }
+      } catch(e) { document.getElementById('agents').innerHTML = '<div class="error">Error: ' + e.message + '</div>'; }
     }
-    
+    function renderAgents(agents) {
+      if (!agents.length) { document.getElementById('agents').innerHTML = '<div class="loading">No agents</div>'; return; }
+      var html = '';
+      agents.forEach(function(agent, idx) {
+        var filesHtml = '';
+        agent.files.forEach(function(f) {
+          filesHtml += '<div class="file-item" onclick="showFile(\'' + f.name + '\')">📄 ' + f.name + '</div>';
+        });
+        html += '<div class="agent-card" onclick="toggleFiles(' + idx + ')"><div class="agent-header"><span class="agent-emoji">' + agent.emoji + '</span><div><div class="agent-name">' + agent.name + '</div><div class="agent-type">' + agent.type + '</div><div class="agent-desc">' + (agent.description || '') + '</div></div></div><div class="files-list" id="files-' + idx + '">' + filesHtml + '</div></div>';
+      });
+      document.getElementById('agents').innerHTML = html;
+    }
+    function toggleFiles(idx) { document.getElementById('files-' + idx).classList.toggle('open'); }
+    function showJobDetail(jobName) {
+      var content = jobDetails[jobName] || "No description available";
+      document.getElementById("modalTitle").textContent = jobName;
+      document.getElementById("modalBody").textContent = content;
+      document.getElementById("fileModal").classList.add("open");
+    }
+
+    function showFile(filename) {
+      var content = fileContents[filename] || 'File content not available.';
+      document.getElementById('modalTitle').textContent = filename;
+      document.getElementById('modalBody').textContent = content;
+      document.getElementById('fileModal').classList.add('open');
+    }
+    function closeModal() { document.getElementById('fileModal').classList.remove('open'); }
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
     function renderCronJobs(jobs) {
-      if (!jobs.length) {
-        document.getElementById('cronJobs').innerHTML = 
-          '<div class="loading">No cron jobs found</div>';
-        return;
-      }
-      
-      const html = jobs.map(job => {
-        const statusClass = job.status === 'Success' ? 'status-success' : 
-                           job.status === 'Failed' ? 'status-failed' : 'status-idle';
-        return `
-          <div class="job-item">
-            <div>
-              <div class="job-name">${job.name}</div>
-              <div class="job-schedule">${job.schedule}</div>
-            </div>
-            <div style="text-align:right">
-              <span class="job-status ${statusClass}">${job.status}</span>
-              <div class="job-time">Next: ${job.nextRun || 'N/A'}</div>
-            </div>
-          </div>
-        `;
-      }).join('');
-      
+      if (!jobs.length) { document.getElementById('cronJobs').innerHTML = '<div class="loading">No jobs</div>'; return; }
+      var html = '';
+      jobs.forEach(function(job) {
+        jobDetails[job.name] = job.fullDescription || job.description;
+        var statusClass = job.lastStatus === 'success' ? 'status-success' : job.lastStatus === 'failed' ? 'status-failed' : 'status-idle';
+        var statusIcon = job.lastStatus === 'success' ? '✓' : job.lastStatus === 'failed' ? '✗' : '?';
+        html += '<div class="job-item" onclick="showJobDetail(\'' + job.name + '\')"><div class="job-info"><div class="job-name">' + job.name + '</div><div class="job-desc">' + job.description + '</div><div class="job-schedule">' + job.schedule + '</div></div><div class="job-status-section"><div class="job-status ' + statusClass + '">' + statusIcon + ' ' + job.lastStatus.toUpperCase() + '</div><div class="job-time"><span class="job-time-label">LAST:</span> ' + job.lastRun + '</div><div class="job-time"><span class="job-time-label">NEXT:</span> ' + job.nextRun + '</div></div></div>';
+      });
       document.getElementById('cronJobs').innerHTML = html;
     }
-    
     function renderStats(jobs) {
       document.getElementById('totalJobs').textContent = jobs.length;
-      document.getElementById('activeJobs').textContent = 
-        jobs.filter(j => j.status === 'Running').length;
-      document.getElementById('failedJobs').textContent = 
-        jobs.filter(j => j.status === 'Failed').length;
+      document.getElementById('activeJobs').textContent = jobs.filter(function(j) { return j.status === 'Running'; }).length;
+      document.getElementById('failedJobs').textContent = jobs.filter(function(j) { return j.status === 'Failed'; }).length;
     }
-    
-    function renderMemory() {
-      const memories = [
-        { name: 'Today', path: 'memory/2026-02-20.md' },
-        { name: 'Yesterday', path: 'memory/2026-02-19.md' },
-        { name: 'MEMORY.md', path: 'MEMORY.md' },
-        { name: 'TOOLS.md', path: 'TOOLS.md' }
-      ];
-      
-      const workspaceUrl = 'https://github.com/deanfieldz/.openclaw/blob/main/workspace';
-      const html = memories.map(m => 
-        `<a href="${workspaceUrl}/${m.path}" target="_blank" class="memory-link">
-          📄 ${m.name}
-        </a>`
-      ).join('');
-      
-      document.getElementById('memoryLinks').innerHTML = html;
-    }
-    
-    // Load on start
     loadDashboard();
-    
-    // Auto-refresh every 5 minutes
-    setInterval(loadDashboard, 5 * 60 * 1000);
   </script>
 </body>
 </html>

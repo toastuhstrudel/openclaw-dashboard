@@ -158,7 +158,7 @@
       "lastRun": "Pending",
       "lastStatus": "pending",
       "nextRun": "2026-02-23 07:00",
-      "fullDescription": "Run Reddit Recipe Scanner: 1) Execute web_search for queries about recipe site frustrations 2) Create ONE entry in Notion Content Database with all threads found 3) Post summary to #morning-update"
+      "fullDescription": "Scan Reddit for recipe frustrations: 1) Run web searches 2) Categorize as \"Helpable\" (asking for solutions) or \"Venting\" (just complaining) 3) Create ONE Notion entry with both categories 4) Engagement: Helpable = provide value first, mention product only if relevant. Venting = empathize only, no promo. 5) Post summary to #morning-update"
     }
   ]
 }
